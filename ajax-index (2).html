@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="initial-scale=1">
+<title>Triad's Serving Hands</title> 
+<link rel="shortcut icon" type="image/x-icon" href="favicon.ico">
+<link rel="stylesheet" type="text/css" href="normalize.css">    
+<link rel="stylesheet" type="text/css" href="jquery.mobile-1.4.5.min.css">  
+<link type="text/css" rel="stylesheet" href="brown.min.css">   
+<link rel="stylesheet" type="text/css" href="stylesheet.css"> 
+	<script type="text/javascript" src="jquery.js"></script>
+	<script type="text/javascript" src="jquery.mobile-1.4.5.min.js">
+    </script>
+</head>
+<body>
+<div data-role="page" id="home" data-theme="b"> 
+    <div data-role="header">
+        <h2>Helping Neighbors</h2>
+    </div>
+	
+	<div data-role="ui-content" class="main">
+<!--        <h3>Feeding Our Community</h3>-->
+        
+        <div>
+            <img src="Logo2.png">
+        </div>
+		
+		<h3>DONATE TODAY!</h3>
+         <h4>Search for a community food pantry near you.</h4>
+		<div>
+	<form id="form1">
+	<table>
+                <tr>
+                    <td><label for="zipcode">Zip Code:</label></td>
+                    <td>
+			<input type="text" name="zipcode" id="zipcode"></td>
+			</tr>
+                    <td></td>
+                    <td>
+			<input type="submit" name="submit" id="submit" value="Search"></td></tr></table>
+	</form>
+	<div id="map" style="width: 921px; height: 329px;"></div>
+	
+	<script type="text/javascript" src="http://maps.google.com/maps/api/js"></script>
+	<script type="text/javascript">
+		window.console = window.console || (function(){
+			var c = {}; 
+			c.log = c.warn = c.debug = c.info = c.error = c.time = c.dir = c.profile = c.clear = c.exception = c.trace = c.assert = function(){};
+    return c;
+})();
+
+	var contentstring = [];
+	var regionlocation = [];
+	var regionlat = [];
+	var regionlon = [];
+	var markers = [];
+	var iterator = 0;
+	var areaiterator = 0;
+	var map;
+	var infowindow = [];
+	geocoder = new google.maps.Geocoder();
+	$('#form1').submit(function(event) {
+		event.preventDefault();
+		$.ajax({
+			type: 'POST',
+			url: 'ajax.php',
+			data: $(this).serialize(),
+			dataType: 'json',
+			success: function (result) {
+				console.log(result);
+				//alert(result.data[0]["location"].latitude);
+				setTimeout(function(){
+					region = new google.maps.LatLng(result.data[0]["location"].latitude, 
+					result.data[0]["location"].longitude);
+					map = new google.maps.Map(document.getElementById("map"), { 
+                zoom: 8,
+                mapTypeId: google.maps.MapTypeId.ROADMAP,
+                center: region,
+            });
+			
+            var icons = 'http://maps.google.com/mapfiles/ms/icons/red-dot.png';
+			for(var i=0;i<result.data.length;i++){				
+				var templat = result.data[i]["location"].latitude;
+				var templong = result.data[i]["location"].longitude;
+				var name= result.data[i]["name"];
+				 var temp_latLng = new google.maps.LatLng(templat, templong);
+				 var address = result.data[i]["hours"]+"<br/>"+result.data[i]["address"] +" , "
+				 result.data[i]["city"]+","+result.data[i]["state"]+","+result.data[i]["zip_code"];
+				 
+				 contentstring.push(result.data[i]["name"]);
+				 var marker = new google.maps.Marker(
+            {
+                position: temp_latLng,
+                map: map,
+				title: name,
+                icon: icons,
+                draggable: false
+            });
+			
+			var infowindow = null;
+			marker.addListener('click', function() {
+if (infowindow) {
+        infowindow.close();
+    }
+	infowindow = new google.maps.InfoWindow();
+	infowindow.setContent('<strong>'+name + '</strong><br />' + address);
+	/*infowindow = new google.maps.InfoWindow({
+    content: name
+  });*/
+    infowindow.open(map, marker);
+  });
+				 markers.push(marker);
+			
+			
+			//info(i);
+			}
+			
+			
+				});
+				
+				}
+		
+
+		
+        });
+		
+		
+		});
+        </script>
+		</div>
+		</div>
+		</div>
+</body>
+</html>

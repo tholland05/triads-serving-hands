@@ -1,0 +1,352 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="initial-scale=1">
+<title>Triad's Serving Hands</title> 
+<link rel="shortcut icon" type="image/x-icon" href="favicon.ico">
+<link rel="stylesheet" type="text/css" href="normalize.css">    
+<link rel="stylesheet" type="text/css" href="jquery.mobile-1.4.5.min.css">  
+<link type="text/css" rel="stylesheet" href="brown.min.css">   
+<link rel="stylesheet" type="text/css" href="stylesheet.css"> 
+	<script type="text/javascript" src="jquery.js"></script>
+	<script type="text/javascript" src="jquery.mobile-1.4.5.min.js">
+    </script>
+</head>
+<body>
+<div data-role="page" id="home" data-theme="b"> 
+    <div data-role="header">
+        <h2>Helping Neighbors</h2>
+    </div>
+	
+	<div data-role="ui-content" class="main">
+<!--        <h3>Feeding Our Community</h3>-->
+        
+        <div id="logo">
+            <img src="Logo2.png">
+        </div>
+		
+		<h3>DONATE TODAY!</h3>
+         <h4>Search for a community food pantry near you.</h4>
+		<div>
+	<form id="form1">
+	<table>
+                <tr>
+                    <td><label for="zipcode">Zip Code:</label></td>
+                    <td>
+			<input type="text" name="zipcode" id="zipcode"></td>
+			</tr>
+                    <td></td>
+                    <td>
+			<input type="submit" name="submit" id="submit" value="Search"></td></tr></table>
+	</form>
+	<div id="map" style="width: 550px; height: 480px;margin:auto;"></div>
+	<br/>
+	
+	<script type="text/javascript" src="http://maps.google.com/maps/api/js"></script>
+	<script type="text/javascript">
+		window.console = window.console || (function(){
+			var c = {}; 
+			c.log = c.warn = c.debug = c.info = c.error = c.time = c.dir = c.profile = c.clear = c.exception = c.trace = c.assert = function(){};
+    return c;
+})();
+
+	var contentstring = [];
+	var regionlocation = [];
+	var regionlat = [];
+	var regionlon = [];
+	var markers = [];
+	var iterator = 0;
+	var areaiterator = 0;
+	var map;
+	var infowindow = [];
+	geocoder = new google.maps.Geocoder();
+	$('#form1').submit(function(event) {
+		event.preventDefault();
+		$.ajax({
+			type: 'POST',
+			url: 'ajax.php',
+			data: $(this).serialize(),
+			dataType: 'json',
+			success: function (result) {
+			//alert(result);
+			$("#logo").hide();
+				console.log(result);
+				//alert(result.data[0]["location"].latitude);
+				setTimeout(function(){
+					region = new google.maps.LatLng(result.data[0]["location"].latitude, 
+					result.data[0]["location"].longitude);
+					map = new google.maps.Map(document.getElementById("map"), { 
+                zoom: 8,
+                mapTypeId: google.maps.MapTypeId.ROADMAP,
+                center: region,
+            });
+			
+            var icons = 'http://maps.google.com/mapfiles/ms/icons/red-dot.png';
+			for(var i=0;i<result.data.length;i++){				
+				var templat = result.data[i]["location"].latitude;
+				var templong = result.data[i]["location"].longitude;
+				var name= result.data[i]["name"];
+				 var temp_latLng = new google.maps.LatLng(templat, templong);
+				 var address = result.data[i]["hours"]+"<br/>"+result.data[i]["address"]+" , "+result.data[i]["city"]+", "+result.data[i]["state"]+" , "+result.data[i]["zip_code"];
+				 //alert(address);
+				 //			 +' , '
+				 //result.data[i]["city"]+","+result.data[i]["state"]+","+result.data[i]["zip_code"];
+				// alert(result.data[i]["city"]);
+				 contentstring.push(result.data[i]["name"]);
+				 var marker = new google.maps.Marker(
+            {
+                position: temp_latLng,
+                map: map,
+				title: name,
+                icon: icons,
+                draggable: false
+            });
+			
+			var infowindow = null;
+			marker.addListener('click', function() {
+if (infowindow) {
+        infowindow.close();
+    }
+	infowindow = new google.maps.InfoWindow();
+	infowindow.setContent('<strong>'+name + '</strong><br />' + address);
+	
+	/*infowindow = new google.maps.InfoWindow({
+    content: name
+  });*/
+    infowindow.open(map, marker);
+  });
+				 markers.push(marker);
+			
+			
+			//info(i);
+			}
+			
+			
+				});
+				
+				}
+		
+
+		
+        });
+		
+		
+		});
+        </script>
+		</div>
+		</div>
+		<div data-role="footer">
+        <h3>Serving Greensboro, High Point &amp; Winston-Salem</h3>
+        
+        <div data-role="navbar">
+            <ul>
+                <li><a href="#home" class="ui-btn-active" data-icon="home">Home</a></li>
+                <li><a href="#location" data-icon="location">Map</a></li>
+                <li><a href="#menu" data-icon="bullets">Volunteer</a></li>
+                <li><a href="#about" data-icon="info">About</a></li>
+                <li><a href="#contact" data-icon="comment">Contact</a></li>
+            </ul>
+        </div>
+    </div>
+		</div>
+    
+    <div data-role="page" id="location" data-theme="b">
+        <div data-role="header">
+            <h2>Map</h2>
+        </div>
+        
+        <div data-role="ui-content" class="main">
+            <h3>A full map of Triad Food Pantries.</h3>
+<div><iframe width="560px" title="TriadFoodPantries" height="520px" src="https://brigades.opendatanetwork.com/w/bpnf-uk9g/?cur=NWjn03En0et&from=root" frameborder="0"scrolling="no"><a href="https://brigades.opendatanetwork.com/INEQUALITY/TriadFoodPantries/bpnf-uk9g" title="TriadFoodPantries" target="_blank">TriadFoodPantries</a></iframe><p><a href="http://www.socrata.com/" target="_blank">Powered by Socrata</a></p></div>
+            
+        </div>
+        
+        <div data-role="footer">
+            
+            <div data-role="navbar">
+                <ul>
+                    <li><a href="#home" data-icon="home">Home</a></li>
+                    <li><a href="#location" class="ui-btn-active" data-icon="location">Map</a></li>
+                    <li><a href="#menu" data-icon="bullets">Volunteer</a></li>
+                    <li><a href="#about" data-icon="info">About</a></li>
+                    <li><a href="#contact" data-icon="comment">Contact</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    
+    
+    <div data-role="page" id="menu" data-theme="b"> 
+        <div data-role="header">
+            <h2>Volunteer</h2>
+        </div>
+        
+        <div data-role="ui-content" class="main">
+            
+            <h3>Volunteer opportunities are available at food pantries throughout the Triad. Submit your information below to be matched with a food pantry in your neighborhood.</h3>
+            
+            
+            <div>
+                
+                <br>
+                
+                <div> <img src="dof.png">
+                </div>
+                
+                <br>
+            
+                <div data-role="ui-content" class="main">
+            <h2>Sign Up</h2>
+            
+            <table>
+                <tr>
+                    <td><label for="name">Name:</label></td>
+                    <td><input type="text" id="name" name="name" /></td>
+                </tr>
+                
+                <tr>
+                    <td><label for="email">Email:</label></td>
+                    <td><input type="text" id="email" name="email" /></td>
+                </tr>
+                
+                <tr>
+                    <td><label for="address">Address:</label></td>
+                    <td><textarea id="message" name="message" rows="8" cols="30"></textarea></td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td><input type="submit" value="Send" id="send" /></td>
+                </tr>
+            </table>
+        </div>        
+                
+                </div>
+                
+            </div>
+            
+            <div data-role="footer">
+<!--                <h2>Or make your own custom creation!</h2>-->
+                <div data-role="navbar">
+                    <ul>
+                        <li><a href="#home" data-icon="home">Home</a></li>                          <li><a href="#location" data-icon="location">Map</a></li>
+                        <li><a href="#menu" class="ui-btn-active" data-icon="bullets">Volunteer</a></li>
+                        <li><a href="#about" data-icon="info">About</a></li>
+                        <li><a href="#contact" data-icon="comment">Contact</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+        
+    <div data-role="page" id="about" data-theme="b">
+        <div data-role="header">
+            <h2>About Us</h2>
+        </div>
+        
+        <div data-role="ui-content" class="main">
+            <h2>Helping to Feed our Triad Neighbors</h2>
+            
+              <div> <img src="handswithcans.png">
+            </div>
+        </div>
+            
+            <p>When we give to others, we don’t only make them feel closer to us; we also feel closer to them thus creating a sense of community. These exchanges promote a sense of trust and cooperation that strengthens our ties to others.</p>
+        
+        <p>A wide range of research has linked different forms of generosity to better health, even among the sick and elderly.</p>
+        
+        <p>North Carolina Food Banks notes that the Triad cities and Asheville North Carolina have the highest level of food deprivation in the nation. Aside from that staggering statistic right outside of our backyard 1 in 4 children suffer from food insecurity.<p>
+        
+        <p>We as the greater Greensboro community and the Triad are have the ability to change all of this with our app “Triad’s Serving Hands.”</p>
+        <br>
+        
+        <div data-role="footer">
+            
+            <h2>Serving Greensboro, High Point &amp; Winston-Salem</h2>
+            
+            <div data-role="navbar">
+                
+                <ul>
+                    <li><a href="#home" data-icon="home">Home</a></li>                       <li><a href="#location" data-icon="location">Map</a></li>
+                    <li><a href="#menu" data-icon="bullets">Volunteer</a></li>
+                    <li><a href="#about" class="ui-btn-active" data-icon="info">About</a></li>
+                    <li><a href="#contact" data-icon="comment">Contact</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    
+    <div data-role="page" id="contact" data-theme="b">
+        <div data-role="header">
+            
+            <h2>Contact Us</h2>
+        </div>
+        
+        <div data-role="ui-content" class="main">
+            <h2>Questions? Feedback?</h2>
+            
+            <table>
+                <tr>
+                    <td><label for="name">Name:</label></td>
+                    <td><input type="text" id="name" name="name" /></td>
+                </tr>
+                
+                <tr>
+                    <td><label for="email">Email:</label></td>
+                    <td><input type="text" id="email" name="email" /></td>
+                </tr>
+                
+                <tr>
+                    <td><label for="message">Message:</label></td>
+                    <td><textarea id="message" name="message" rows="8" cols="30"></textarea></td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td><input type="submit" value="Send" id="send" /></td>
+                </tr>
+            </table>
+        </div>
+        
+        <br>
+            <br>
+            <br>
+            <br>
+         <br>
+            <br>
+            <br>
+            <br>
+         <br>
+            <br>
+            <br>
+            <br>
+         <br>
+
+        
+        <div data-role="footer">
+            
+           
+            <h2>We want to hear from you!</h2>
+           
+         
+            
+            
+            <div data-role="navbar">
+                
+                <ul>
+                    <li><a href="#home" data-icon="home">Home</a></li>
+                    <li><a href="#location" data-icon="location">Map</a></li>
+                    <li><a href="#menu" data-icon="bullets">Volunteer</a></li>
+                    <li><a href="#about" data-icon="info">About</a></li>
+                    <li><a href="#contact" class="ui-btn-active" data-icon="comment">Contact</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    
+    </div>    
+    
+    
+    
+</body>
+</html>

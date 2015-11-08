@@ -1,0 +1,68 @@
+/*CSS Stylesheet*/
+
+/*form source: http://www.tutwow.com/htmlcss/create-a-simple-and-secure-contact-form-with-jquery-and-php/comment-page-1/*/
+
+/** {border: 1px solid black;}*/
+
+body {
+    margin: 0;
+}
+img {
+    max-width: 100%;
+    height: auto;
+}
+
+.main {
+    text-align: center;
+}
+
+ul {
+    list-style: none;
+    padding: 0 0 10px 0;
+    text-align: center;
+    margin: 0 auto;
+}
+
+#menuList li {
+    font-size: .85em;
+    text-align: left;
+    list-style: disc;
+    line-height: 1.2em;
+}
+
+#hours {
+    align-content: center;
+}
+
+#sourceCredit {
+    font-size: .6em;
+}
+
+table {
+    margin: 0 auto;
+}
+
+tr, td, input, textarea {
+    margin: 0;
+    padding: 0;
+}
+
+td {
+    padding: 0 0 5px;
+}
+
+tr td:first-child {
+    padding-right: 10px;
+    padding-top: 11px;
+    text-align: right;
+}
+
+textarea {
+    height: 240px;
+    resize: vertical;
+}
+
+a:link, a:visited, a:hover, a:active {
+    color: #fff;
+    text-decoration: none;  
+}
